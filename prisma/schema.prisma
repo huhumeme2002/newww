@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admin_activities {
+  id             Int       @id @default(autoincrement())
+  admin_id       Int?
+  activity_type  String    @db.VarChar(50)
+  target_user_id Int?
+  description    String?
+  old_value      Json?     @db.Json
+  new_value      Json?     @db.Json
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([admin_id], map: "idx_admin_activities_admin_id")
+}
+
+model daily_login_codes {
+  id         Int       @id @default(autoincrement())
+  date       DateTime  @unique @db.Date
+  code       String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([date], map: "idx_daily_login_codes_date")
+}
+
+model frequency_tracking {
+  id                Int       @id @default(autoincrement())
+  ip_address        String?   @db.VarChar(45)
+  endpoint          String?   @db.VarChar(255)
+  request_timestamp DateTime? @default(now()) @db.Timestamp(6)
+  user_agent        String?
+  blocked           Boolean?  @default(false)
+
+  @@index([ip_address, endpoint, request_timestamp], map: "idx_frequency_tracking_ip_endpoint_time")
+}
+
+model generated_tokens {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  token_value   String    @unique @db.VarChar(500)
+  requests_cost Int       @default(50)
+  is_active     Boolean?  @default(true)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  last_used_at  DateTime? @db.Timestamp(6)
+  usage_count   Int?      @default(0)
+
+  @@index([is_active], map: "idx_generated_tokens_active")
+  @@index([user_id], map: "idx_generated_tokens_user_id")
+}
+
+model ip_rate_limits {
+  id            Int       @id @default(autoincrement())
+  ip_address    String    @db.VarChar(45)
+  endpoint      String    @db.VarChar(255)
+  request_count Int?      @default(1)
+  first_request DateTime? @default(now()) @db.Timestamp(6)
+  last_request  DateTime? @default(now()) @db.Timestamp(6)
+  blocked_until DateTime? @db.Timestamp(6)
+  is_suspicious Boolean?  @default(false)
+
+  @@index([ip_address, endpoint], map: "idx_ip_rate_limits_ip_endpoint")
+}
+
+model key_attempts {
+  id            Int       @id @default(autoincrement())
+  user_id       Int?
+  ip_address    String?   @db.VarChar(45)
+  failed_count  Int?      @default(0)
+  last_attempt  DateTime? @default(now()) @db.Timestamp(6)
+  blocked_until DateTime? @db.Timestamp(6)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  users         users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ip_address], map: "idx_key_attempts_ip")
+  @@index([user_id], map: "idx_key_attempts_user_id")
+}
+
+model keys {
+  id          Int       @id @default(autoincrement())
+  key_value   String    @unique @db.VarChar(255)
+  requests    Int
+  is_used     Boolean?  @default(false)
+  used_by     Int?
+  used_at     DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  expires_at  DateTime? @db.Timestamp(6)
+  is_expired  Boolean?  @default(false)
+  description String?
+  key_type    String?   @default("regular") @db.VarChar(20)
+
+  @@index([expires_at], map: "idx_keys_expires_at")
+}
+
+model notifications {
+  id                                        Int       @id @default(autoincrement())
+  title                                     String    @db.VarChar(255)
+  message                                   String
+  type                                      String?   @default("info") @db.VarChar(50)
+  target_user_id                            Int?
+  admin_id                                  Int?
+  is_read                                   Boolean?  @default(false)
+  created_at                                DateTime? @default(now()) @db.Timestamp(6)
+  users_notifications_admin_idTousers       users?    @relation("notifications_admin_idTousers", fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_notifications_target_user_idTousers users?    @relation("notifications_target_user_idTousers", fields: [target_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([target_user_id, created_at(sort: Desc)], map: "idx_notifications_target_user_created")
+}
+
+model request_transactions {
+  id              Int       @id(map: "credit_transactions_pkey") @default(autoincrement())
+  user_id         Int?
+  requests_amount Int
+  description     String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([user_id], map: "idx_request_transactions_user_id")
+}
+
+model security_incidents {
+  id            Int       @id @default(autoincrement())
+  ip_address    String?   @db.VarChar(45)
+  endpoint      String?   @db.VarChar(255)
+  user_agent    String?
+  incident_type String?   @db.VarChar(100)
+  details       Json?
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model token_usage_log {
+  id          Int       @id @default(autoincrement())
+  token_value String
+  used_by     Int?
+  used_at     DateTime? @default(now()) @db.Timestamp(6)
+  ip_address  String?   @db.VarChar(45)
+  users       users?    @relation(fields: [used_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([token_value], map: "idx_token_usage_token")
+}
+
+model tokens {
+  id          Int       @id @default(autoincrement())
+  token_value String    @unique
+  is_used     Boolean?  @default(false)
+  used_by     Int?
+  used_at     DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([created_at], map: "idx_tokens_created_at")
+  @@index([is_used], map: "idx_tokens_is_used")
+}
+
+model uploaded_tokens {
+  id              Int       @id @default(autoincrement())
+  token_value     String    @unique @db.VarChar(500)
+  requests        Int       @default(0)
+  expires_at      DateTime? @db.Timestamp(6)
+  is_used         Boolean?  @default(false)
+  used_by         Int?
+  used_at         DateTime? @db.Timestamp(6)
+  upload_batch_id String?   @db.Uuid
+  description     String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([expires_at], map: "idx_uploaded_tokens_expires_at")
+  @@index([is_used], map: "idx_uploaded_tokens_used")
+}
+
+model user_daily_code_claims {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  date       DateTime  @db.Date
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, date])
+  @@index([user_id, date], map: "idx_user_daily_code_claims_user_date")
+}
+
+model users {
+  id                                                Int                      @id @default(autoincrement())
+  username                                          String                   @unique @db.VarChar(50)
+  email                                             String                   @unique @db.VarChar(255)
+  password_hash                                     String                   @db.VarChar(255)
+  requests                                          Int?                     @default(0)
+  role                                              String?                  @default("user") @db.VarChar(20)
+  is_active                                         Boolean?                 @default(true)
+  last_login                                        DateTime?                @db.Timestamp(6)
+  created_at                                        DateTime?                @default(now()) @db.Timestamp(6)
+  updated_at                                        DateTime?                @default(now()) @db.Timestamp(6)
+  expiry_time                                       DateTime?                @db.Timestamptz(6)
+  is_expired                                        Boolean?                 @default(false)
+  key_attempts                                      key_attempts[]
+  notifications_notifications_admin_idTousers       notifications[]          @relation("notifications_admin_idTousers")
+  notifications_notifications_target_user_idTousers notifications[]          @relation("notifications_target_user_idTousers")
+  token_usage_log                                   token_usage_log[]
+  user_daily_code_claims                            user_daily_code_claims[]
+}
