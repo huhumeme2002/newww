@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/utils"
-import { User as PrismaUser } from "@prisma/client"
+import { users as PrismaUser } from "@prisma/client"
 
 declare module "next-auth" {
   interface Session {
@@ -84,9 +84,9 @@ export const authOptions: NextAuthOptions = {
           id: user.id.toString(),
           username: user.username,
           email: user.email,
-          role: user.role,
-          requests: user.requests,
-          isActive: user.is_active,
+          role: user.role || 'user',
+          requests: user.requests || 0,
+          isActive: user.is_active || false,
         }
       }
     })
@@ -113,16 +113,16 @@ export const authOptions: NextAuthOptions = {
       const now = Date.now()
       const fiveMinutes = 5 * 60 * 1000
       
-      if (token.id && (!token.lastChecked || now - token.lastChecked > fiveMinutes)) {
+      if (token.id && (!token.lastChecked || now - (token.lastChecked as number) > fiveMinutes)) {
         const dbUser = await prisma.users.findUnique({
           where: { id: parseInt(token.id) }
         })
 
         if (dbUser) {
           token.username = dbUser.username
-          token.role = dbUser.role
-          token.requests = dbUser.requests
-          token.isActive = dbUser.is_active
+          token.role = dbUser.role || 'user'
+          token.requests = dbUser.requests || 0
+          token.isActive = dbUser.is_active || false
           token.lastChecked = now
         }
       }
@@ -143,7 +143,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/login',
-    signUp: '/auth/register',
   },
   secret: process.env.NEXTAUTH_SECRET,
 }

@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ 
       user,
-      isAdmin: user.role.toLowerCase() === 'admin'
+      isAdmin: user.role?.toLowerCase() === 'admin'
     })
   } catch (error) {
     return NextResponse.json({ 

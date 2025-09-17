@@ -151,7 +151,7 @@ export default async function HistoryPage() {
                           <p className="font-medium">{label}</p>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {transaction.description || formatDate(transaction.created_at)}
+                          {transaction.description || (transaction.created_at ? formatDate(transaction.created_at) : 'N/A')}
                         </p>
                       </div>
                     </div>
@@ -163,7 +163,7 @@ export default async function HistoryPage() {
                         {isPositive ? '+' : ''}{formatNumber(transaction.requests_amount)} requests
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatRelativeTime(transaction.created_at)}
+                        {transaction.created_at ? formatRelativeTime(transaction.created_at) : 'N/A'}
                       </p>
                     </div>
                   </div>

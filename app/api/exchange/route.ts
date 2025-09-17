@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const tokensRequested = Math.max(1, Number(requestAmount))
     const totalRequestsNeeded = tokensRequested * TOKEN_COST_REQUESTS
 
-    if (user.requests < totalRequestsNeeded) {
+    if ((user.requests || 0) < totalRequestsNeeded) {
       return NextResponse.json(
         { error: "Số request không đủ" },
         { status: 400 }

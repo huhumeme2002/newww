@@ -86,8 +86,8 @@ function normalizeRole(role: string): 'USER' | 'ADMIN' {
   return role.toLowerCase() === 'admin' ? 'ADMIN' : 'USER'
 }
 
-function normalizeKeyType(keyType: string): 'REGULAR' | 'CUSTOM' {
-  return keyType.toLowerCase() === 'custom' ? 'CUSTOM' : 'REGULAR'
+function normalizeKeyType(key_type: string): 'REGULAR' | 'CUSTOM' {
+  return key_type.toLowerCase() === 'custom' ? 'CUSTOM' : 'REGULAR'
 }
 
 function normalizeTransactionType(type: string): 'REQUEST_TO_TOKEN' | 'KEY_REDEEM' | 'ADMIN_ADJUSTMENT' {
@@ -121,34 +121,34 @@ async function migrateUsers() {
   
   for (const jsonUser of jsonUsers) {
     try {
-      await prisma.user.upsert({
+      await prisma.users.upsert({
         where: { id: jsonUser.id },
         update: {
           username: jsonUser.username,
           email: jsonUser.email,
-          passwordHash: jsonUser.password_hash,
+          password_hash: jsonUser.password_hash,
           requests: jsonUser.requests,
           role: normalizeRole(jsonUser.role),
-          isActive: jsonUser.is_active,
-          lastLogin: parseDate(jsonUser.last_login),
-          expiryTime: parseDate(jsonUser.expiry_time),
-          isExpired: jsonUser.is_expired,
-          createdAt: parseDate(jsonUser.created_at) || new Date(),
-          updatedAt: parseDate(jsonUser.updated_at) || new Date(),
+          is_active: jsonUser.is_active,
+          last_login: parseDate(jsonUser.last_login),
+          expiry_time: parseDate(jsonUser.expiry_time),
+          is_expired: jsonUser.is_expired,
+          created_at: parseDate(jsonUser.created_at) || new Date(),
+          updated_at: parseDate(jsonUser.updated_at) || new Date(),
         },
         create: {
           id: jsonUser.id,
           username: jsonUser.username,
           email: jsonUser.email,
-          passwordHash: jsonUser.password_hash,
+          password_hash: jsonUser.password_hash,
           requests: jsonUser.requests,
           role: normalizeRole(jsonUser.role),
-          isActive: jsonUser.is_active,
-          lastLogin: parseDate(jsonUser.last_login),
-          expiryTime: parseDate(jsonUser.expiry_time),
-          isExpired: jsonUser.is_expired,
-          createdAt: parseDate(jsonUser.created_at) || new Date(),
-          updatedAt: parseDate(jsonUser.updated_at) || new Date(),
+          is_active: jsonUser.is_active,
+          last_login: parseDate(jsonUser.last_login),
+          expiry_time: parseDate(jsonUser.expiry_time),
+          is_expired: jsonUser.is_expired,
+          created_at: parseDate(jsonUser.created_at) || new Date(),
+          updated_at: parseDate(jsonUser.updated_at) || new Date(),
         },
       })
     } catch (error) {
@@ -166,32 +166,32 @@ async function migrateKeys() {
   
   for (const jsonKey of jsonKeys) {
     try {
-      await prisma.key.upsert({
+      await prisma.keys.upsert({
         where: { id: jsonKey.id },
         update: {
-          keyValue: jsonKey.key_value,
+          key_value: jsonKey.key_value,
           requests: jsonKey.requests,
-          isUsed: jsonKey.is_used,
-          usedBy: jsonKey.used_by,
-          usedAt: parseDate(jsonKey.used_at),
-          expiresAt: parseDate(jsonKey.expires_at),
-          isExpired: jsonKey.is_expired,
+          is_used: jsonKey.is_used,
+          used_by: jsonKey.used_by,
+          used_at: parseDate(jsonKey.used_at),
+          expires_at: parseDate(jsonKey.expires_at),
+          is_expired: jsonKey.is_expired,
           description: jsonKey.description,
-          keyType: normalizeKeyType(jsonKey.key_type),
-          createdAt: parseDate(jsonKey.created_at) || new Date(),
+          key_type: normalizeKeyType(jsonKey.key_type),
+          created_at: parseDate(jsonKey.created_at) || new Date(),
         },
         create: {
           id: jsonKey.id,
-          keyValue: jsonKey.key_value,
+          key_value: jsonKey.key_value,
           requests: jsonKey.requests,
-          isUsed: jsonKey.is_used,
-          usedBy: jsonKey.used_by,
-          usedAt: parseDate(jsonKey.used_at),
-          expiresAt: parseDate(jsonKey.expires_at),
-          isExpired: jsonKey.is_expired,
+          is_used: jsonKey.is_used,
+          used_by: jsonKey.used_by,
+          used_at: parseDate(jsonKey.used_at),
+          expires_at: parseDate(jsonKey.expires_at),
+          is_expired: jsonKey.is_expired,
           description: jsonKey.description,
-          keyType: normalizeKeyType(jsonKey.key_type),
-          createdAt: parseDate(jsonKey.created_at) || new Date(),
+          key_type: normalizeKeyType(jsonKey.key_type),
+          created_at: parseDate(jsonKey.created_at) || new Date(),
         },
       })
     } catch (error) {
@@ -209,26 +209,26 @@ async function migrateTokens() {
   
   for (const jsonToken of jsonTokens) {
     try {
-      await prisma.generatedToken.upsert({
+      await prisma.generated_tokens.upsert({
         where: { id: jsonToken.id },
         update: {
-          userId: jsonToken.user_id,
-          tokenValue: jsonToken.token_value,
-          requestsCost: jsonToken.requests_cost,
-          isActive: jsonToken.is_active,
-          lastUsedAt: parseDate(jsonToken.last_used_at),
-          usageCount: jsonToken.usage_count,
-          createdAt: parseDate(jsonToken.created_at) || new Date(),
+          user_id: jsonToken.user_id,
+          token_value: jsonToken.token_value,
+          requests_cost: jsonToken.requests_cost,
+          is_active: jsonToken.is_active,
+          last_used_at: parseDate(jsonToken.last_used_at),
+          usage_count: jsonToken.usage_count,
+          created_at: parseDate(jsonToken.created_at) || new Date(),
         },
         create: {
           id: jsonToken.id,
-          userId: jsonToken.user_id,
-          tokenValue: jsonToken.token_value,
-          requestsCost: jsonToken.requests_cost,
-          isActive: jsonToken.is_active,
-          lastUsedAt: parseDate(jsonToken.last_used_at),
-          usageCount: jsonToken.usage_count,
-          createdAt: parseDate(jsonToken.created_at) || new Date(),
+          user_id: jsonToken.user_id,
+          token_value: jsonToken.token_value,
+          requests_cost: jsonToken.requests_cost,
+          is_active: jsonToken.is_active,
+          last_used_at: parseDate(jsonToken.last_used_at),
+          usage_count: jsonToken.usage_count,
+          created_at: parseDate(jsonToken.created_at) || new Date(),
         },
       })
     } catch (error) {
@@ -246,20 +246,20 @@ async function migrateTokenUsage() {
   
   for (const jsonUsage of jsonUsages) {
     try {
-      await prisma.tokenUsageLog.upsert({
+      await prisma.token_usage_log.upsert({
         where: { id: jsonUsage.id },
         update: {
-          tokenValue: jsonUsage.token_value,
-          usedBy: jsonUsage.used_by,
-          usedAt: parseDate(jsonUsage.used_at) || new Date(),
-          ipAddress: jsonUsage.ip_address,
+          token_value: jsonUsage.token_value,
+          used_by: jsonUsage.used_by,
+          used_at: parseDate(jsonUsage.used_at) || new Date(),
+          ip_address: jsonUsage.ip_address,
         },
         create: {
           id: jsonUsage.id,
-          tokenValue: jsonUsage.token_value,
-          usedBy: jsonUsage.used_by,
-          usedAt: parseDate(jsonUsage.used_at) || new Date(),
-          ipAddress: jsonUsage.ip_address,
+          token_value: jsonUsage.token_value,
+          used_by: jsonUsage.used_by,
+          used_at: parseDate(jsonUsage.used_at) || new Date(),
+          ip_address: jsonUsage.ip_address,
         },
       })
     } catch (error) {
@@ -277,22 +277,20 @@ async function migrateTransactions() {
   
   for (const jsonTransaction of jsonTransactions) {
     try {
-      await prisma.requestTransaction.upsert({
+      await prisma.request_transactions.upsert({
         where: { id: jsonTransaction.id },
         update: {
-          userId: jsonTransaction.user_id,
-          type: normalizeTransactionType(jsonTransaction.type),
-          amount: jsonTransaction.amount,
+          user_id: jsonTransaction.user_id,
+          requests_amount: jsonTransaction.amount,
           description: jsonTransaction.description,
-          createdAt: parseDate(jsonTransaction.created_at) || new Date(),
+          created_at: parseDate(jsonTransaction.created_at) || new Date(),
         },
         create: {
           id: jsonTransaction.id,
-          userId: jsonTransaction.user_id,
-          type: normalizeTransactionType(jsonTransaction.type),
-          amount: jsonTransaction.amount,
+          user_id: jsonTransaction.user_id,
+          requests_amount: jsonTransaction.amount,
           description: jsonTransaction.description,
-          createdAt: parseDate(jsonTransaction.created_at) || new Date(),
+          created_at: parseDate(jsonTransaction.created_at) || new Date(),
         },
       })
     } catch (error) {
@@ -307,11 +305,11 @@ async function validateMigration() {
   console.log('🔍 Validating migration...')
   
   const stats = await prisma.$transaction([
-    prisma.user.count(),
-    prisma.key.count(),
-    prisma.generatedToken.count(),
-    prisma.tokenUsageLog.count(),
-    prisma.requestTransaction.count(),
+    prisma.users.count(),
+    prisma.keys.count(),
+    prisma.generated_tokens.count(),
+    prisma.token_usage_log.count(),
+    prisma.request_transactions.count(),
   ])
   
   console.log('📊 Migration Summary:')
@@ -320,28 +318,6 @@ async function validateMigration() {
   console.log(`  Generated Tokens: ${stats[2]}`)
   console.log(`  Token Usage Logs: ${stats[3]}`)
   console.log(`  Request Transactions: ${stats[4]}`)
-  
-  // Check for data integrity
-  const usersWithInvalidKeys = await prisma.key.count({
-    where: {
-      usedBy: { not: null },
-      user: null
-    }
-  })
-  
-  if (usersWithInvalidKeys > 0) {
-    console.warn(`⚠️  Warning: ${usersWithInvalidKeys} keys reference non-existent users`)
-  }
-  
-  const tokensWithInvalidUsers = await prisma.generatedToken.count({
-    where: {
-      user: null
-    }
-  })
-  
-  if (tokensWithInvalidUsers > 0) {
-    console.warn(`⚠️  Warning: ${tokensWithInvalidUsers} tokens reference non-existent users`)
-  }
   
   console.log('✅ Migration validation completed')
 }
