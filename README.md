@@ -173,19 +173,59 @@ Hệ thống sử dụng NextAuth.js với credential provider:
    - Configure environment variables
 
 2. **Database Setup**
-   - Setup Neon PostgreSQL
+   - Setup Neon PostgreSQL hoặc Supabase
    - Update DATABASE_URL
 
-3. **Deploy**
+3. **Environment Variables Setup**
+   
+   **Cách 1: Qua Vercel Dashboard**
+   - Vào [vercel.com/dashboard](https://vercel.com/dashboard)
+   - Chọn project → Settings → Environment Variables
+   - Thêm các biến sau:
+     ```
+     DATABASE_URL = postgresql://username:password@host:port/database
+     NEXTAUTH_SECRET = your-secret-key-here
+     NEXTAUTH_URL = https://your-domain.vercel.app
+     ```
+
+   **Cách 2: Qua Vercel CLI**
+   ```bash
+   # Cài đặt Vercel CLI
+   npm i -g vercel
+   
+   # Đăng nhập
+   vercel login
+   
+   # Thêm environment variables
+   vercel env add DATABASE_URL
+   vercel env add NEXTAUTH_SECRET
+   vercel env add NEXTAUTH_URL
+   
+   # Deploy
+   vercel --prod
+   ```
+
+4. **Deploy**
    - Automatic deployments từ Git
    - Preview deployments cho PRs
 
 ### Environment Variables for Production
 ```env
-DATABASE_URL="postgresql://..."
-NEXTAUTH_SECRET="production-secret"
-NEXTAUTH_URL="https://your-domain.com"
+DATABASE_URL="postgresql://username:password@host:port/database"
+NEXTAUTH_SECRET="your-production-secret-key"
+NEXTAUTH_URL="https://your-domain.vercel.app"
 ```
+
+### Troubleshooting Vercel Deployment
+
+**Lỗi: "Environment Variable DATABASE_URL references Secret which does not exist"**
+- Đảm bảo đã thêm DATABASE_URL trong Vercel Environment Variables
+- Redeploy sau khi thêm biến môi trường
+
+**Lỗi: "Database connection failed"**
+- Kiểm tra DATABASE_URL format
+- Đảm bảo database server đang chạy
+- Test connection local trước khi deploy
 
 ## 📊 Admin Features
 
