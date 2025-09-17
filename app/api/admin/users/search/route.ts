@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const runtime = "nodejs"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
