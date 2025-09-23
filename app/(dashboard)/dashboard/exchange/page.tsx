@@ -85,9 +85,7 @@ export default function ExchangePage() {
     }
   }
 
-  const setMaxAmount = () => {
-    setValue("requestAmount", userRequests)
-  }
+  // No quantity selection; always 1 token per exchange
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -178,7 +176,7 @@ export default function ExchangePage() {
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Sau khi đổi:</span>
                 <span className="text-lg font-semibold">
-                  {formatNumber(userRequests - ((requestAmount || 0) * TOKEN_COST_REQUESTS))}
+                  {formatNumber(userRequests - TOKEN_COST_REQUESTS)}
                 </span>
               </div>
             </CardContent>
