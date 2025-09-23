@@ -63,11 +63,6 @@ const navItems = [
     icon: Coins,
   },
   {
-    title: "Thống kê",
-    href: "/admin/analytics",
-    icon: BarChart3,
-  },
-  {
     title: "Cài đặt hệ thống",
     href: "/admin/settings",
     icon: Settings,
