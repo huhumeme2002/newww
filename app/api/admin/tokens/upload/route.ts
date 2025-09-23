@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
       inserted += batch.length
     }
 
-    return NextResponse.redirect(new URL('/admin/tokens?uploaded=' + inserted, req.url))
+    // Use 303 See Other to ensure browser follows with GET (avoid POST to page -> 405)
+    return NextResponse.redirect(new URL('/admin/tokens?uploaded=' + inserted, req.url), 303)
   } catch (error) {
     console.error('Upload tokens error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
