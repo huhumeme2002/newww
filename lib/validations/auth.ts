@@ -8,11 +8,11 @@ export const loginSchema = z.object({
       (value) => {
         // Allow either email format or username format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
+        const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/
         return emailRegex.test(value) || usernameRegex.test(value)
       },
       {
-        message: "Vui lòng nhập email hợp lệ hoặc username (3-20 ký tự, chỉ chữ cái, số, _)"
+        message: "Vui lòng nhập email hợp lệ hoặc username (3-20 ký tự, chỉ chữ cái, số, _, -)"
       }
     ),
   password: z
@@ -26,7 +26,7 @@ export const registerSchema = z.object({
     .string()
     .min(3, "Username phải có ít nhất 3 ký tự")
     .max(20, "Username quá dài")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username chỉ được chứa chữ cái, số và dấu gạch dưới"),
+    .regex(/^[a-zA-Z0-9_-]+$/, "Username chỉ được chứa chữ cái, số, dấu gạch dưới (_) và gạch ngang (-)"),
   email: z
     .string()
     .min(1, "Email là bắt buộc")
