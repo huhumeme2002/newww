@@ -2,10 +2,7 @@
 
 import { useState } from "react"
 import { useSession } from "next-auth/react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -19,7 +16,6 @@ import {
   AlertCircle, 
   Loader2 
 } from "lucide-react"
-import { exchangeRequestSchema, type ExchangeRequestInput } from "@/lib/validations/exchange"
 import { toast } from "@/components/ui/use-toast"
 import { formatNumber } from "@/lib/utils"
 
@@ -30,25 +26,11 @@ export default function ExchangePage() {
   const [generatedToken, setGeneratedToken] = useState("")
   const [error, setError] = useState("")
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue
-  } = useForm<ExchangeRequestInput>({
-    resolver: zodResolver(exchangeRequestSchema),
-    defaultValues: {
-      requestAmount: 1
-    }
-  })
-
-  const requestAmount = watch("requestAmount")
   const TOKEN_COST_REQUESTS = 50
   const userRequests = session?.user?.requests || 0
 
-  const onSubmit = async (data: ExchangeRequestInput) => {
-    const totalNeeded = (data.requestAmount || 1) * TOKEN_COST_REQUESTS
+  const onSubmit = async () => {
+    const totalNeeded = TOKEN_COST_REQUESTS
     if (totalNeeded > userRequests) {
       setError("Số request không đủ")
       return
@@ -60,10 +42,6 @@ export default function ExchangePage() {
     try {
       const response = await fetch("/api/exchange", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
       })
 
       const result = await response.json()
@@ -73,21 +51,16 @@ export default function ExchangePage() {
         return
       }
 
-      // If API returns multiple tokens, join by newline for copy UX
       const tokenDisplay = Array.isArray(result.tokens) ? result.tokens.join("\n") : result.token
       setGeneratedToken(tokenDisplay)
       setShowResult(true)
       
-      // Update session to reflect new request count
       await update()
       
       toast({
         title: "Đổi token thành công!",
-        description: `Bạn đã đổi ${formatNumber(data.requestAmount)} request thành token`,
+        description: `Bạn đã đổi 1 token (50 requests)`,
       })
-
-      // Reset form
-      setValue("requestAmount", 1)
 
     } catch (error) {
       setError("Có lỗi xảy ra khi đổi token")
@@ -137,11 +110,11 @@ export default function ExchangePage() {
               Thông tin đổi token
             </CardTitle>
             <CardDescription>
-              Nhập số lượng token bạn muốn nhận
+              Mỗi lần chỉ đổi được 1 token (50 requests)
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -150,29 +123,8 @@ export default function ExchangePage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="requestAmount">Số lượng token</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="requestAmount"
-                    type="number"
-                    min="1"
-                    max={Math.floor(userRequests / TOKEN_COST_REQUESTS)}
-                    placeholder="Nhập số token"
-                    {...register("requestAmount", { valueAsNumber: true })}
-                    disabled={isLoading}
-                  />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={setMaxAmount}
-                    disabled={isLoading}
-                  >
-                    Max
-                  </Button>
-                </div>
-                {errors.requestAmount && (
-                  <p className="text-sm text-destructive">{errors.requestAmount.message}</p>
-                )}
+                <Label>Số token muốn đổi</Label>
+                <div className="text-2xl font-bold">1</div>
                 <p className="text-xs text-muted-foreground">
                   Bạn có {formatNumber(userRequests)} request khả dụng
                 </p>
@@ -187,21 +139,21 @@ export default function ExchangePage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Số token muốn đổi:</span>
-                  <span className="font-medium">{formatNumber(requestAmount || 0)}</span>
+                  <span className="font-medium">1</span>
                 </div>
                 <div className="flex justify-between text-sm font-semibold">
                   <span>Requests cần dùng:</span>
-                  <span className="text-primary">{formatNumber((requestAmount || 0) * TOKEN_COST_REQUESTS)}</span>
+                  <span className="text-primary">{formatNumber(TOKEN_COST_REQUESTS)}</span>
                 </div>
               </div>
 
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isLoading || !requestAmount || (requestAmount * TOKEN_COST_REQUESTS) > userRequests}
+                disabled={isLoading || TOKEN_COST_REQUESTS > userRequests}
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Đổi {formatNumber(requestAmount || 0)} Token
+                Đổi 1 Token
               </Button>
             </form>
           </CardContent>

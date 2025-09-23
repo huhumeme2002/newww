@@ -23,18 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    
-    // Validate input
-    const validation = exchangeRequestSchema.safeParse(body)
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: "Dữ liệu không hợp lệ", details: validation.error.issues },
-        { status: 400 }
-      )
-    }
-
-    const { requestAmount } = validation.data
+    // Luôn cấp đúng 1 token mỗi lần
     const userId = parseInt(session.user.id)
     const TOKEN_COST_REQUESTS = 50
 
@@ -51,7 +40,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const tokensRequested = Math.max(1, Number(requestAmount))
+    const tokensRequested = 1
     const totalRequestsNeeded = tokensRequested * TOKEN_COST_REQUESTS
 
     if ((user.requests || 0) < totalRequestsNeeded) {
