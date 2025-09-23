@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Use Neon-provided Prisma URL in Vercel. Locally, set POSTGRES_PRISMA_URL in .env.local (can be same as DATABASE_URL)
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model admin_activities {
