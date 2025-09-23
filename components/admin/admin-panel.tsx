@@ -19,6 +19,10 @@ export function AdminPanel() {
 
   const [dailyCode, setDailyCode] = useState("")
 
+  // Change password
+  const [newPass, setNewPass] = useState("")
+  const [confirmNewPass, setConfirmNewPass] = useState("")
+
   const searchUsers = async () => {
     const q = (document.getElementById('adm-q') as HTMLInputElement).value
     if (!q.trim()) return
@@ -103,6 +107,39 @@ export function AdminPanel() {
     } catch (error) {
       console.error("Adjust expiry error:", error)
       alert("Lỗi điều chỉnh hạn dùng")
+    }
+  }
+
+  const changePassword = async () => {
+    if (!selectedUserId || !newPass) {
+      alert("Vui lòng chọn user và nhập mật khẩu mới")
+      return
+    }
+    if (newPass.length < 6) {
+      alert("Mật khẩu mới phải có ít nhất 6 ký tự")
+      return
+    }
+    if (newPass !== confirmNewPass) {
+      alert("Xác nhận mật khẩu không khớp")
+      return
+    }
+    try {
+      const res = await fetch('/api/admin/users/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: parseInt(selectedUserId), newPassword: newPass })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        alert('Đã cập nhật mật khẩu mới cho user')
+        setNewPass("")
+        setConfirmNewPass("")
+      } else {
+        alert(data.error || 'Không thể đổi mật khẩu')
+      }
+    } catch (error) {
+      console.error('Change password error:', error)
+      alert('Lỗi đổi mật khẩu')
     }
   }
 
@@ -237,6 +274,45 @@ export function AdminPanel() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Change password */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Đổi mật khẩu người dùng</CardTitle>
+          <CardDescription>Nhập User ID và mật khẩu mới</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label>User ID</Label>
+              <Input 
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                placeholder="VD: 123" 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Mật khẩu mới</Label>
+              <Input 
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+                type="password"
+                placeholder="Tối thiểu 6 ký tự" 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Xác nhận mật khẩu</Label>
+              <Input 
+                value={confirmNewPass}
+                onChange={(e) => setConfirmNewPass(e.target.value)}
+                type="password"
+                placeholder="Nhập lại mật khẩu" 
+              />
+            </div>
+          </div>
+          <Button onClick={changePassword}>Đổi mật khẩu</Button>
         </CardContent>
       </Card>
 
