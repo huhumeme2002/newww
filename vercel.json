@@ -1,0 +1,17 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "env": {
+    "DATABASE_URL": "$DATABASE_URL",
+    "NEXTAUTH_SECRET": "$NEXTAUTH_SECRET",
+    "NEXTAUTH_URL": "$NEXTAUTH_URL"
+  },
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 30
+    }
+  }
+}
