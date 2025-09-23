@@ -9,10 +9,10 @@ import { NextAuthProvider } from '@/components/session-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Token Exchange - Đổi Request thành Token',
+  title: 'Cursor Pro - Đổi Request thành Token',
   description: 'Hệ thống quản lý và đổi request thành token một cách dễ dàng và bảo mật',
-  keywords: ['token', 'exchange', 'request', 'api'],
-  authors: [{ name: 'Token Exchange Team' }],
+  keywords: ['cursor', 'pro', 'token', 'exchange', 'request', 'api'],
+  authors: [{ name: 'Cursor Pro Team' }],
 }
 
 export const viewport = {

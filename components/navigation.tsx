@@ -23,7 +23,7 @@ export function Navigation() {
             <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
               <Coins className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Token Exchange</span>
+<span className="text-xl font-bold">Cursor Pro</span>
           </Link>
 
           {/* Desktop Navigation */}
